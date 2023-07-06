@@ -10,5 +10,7 @@ namespace reddit_app_api.Data
 
         public DbSet<UserDetails> UserDetails { get; set; }
         public DbSet<Accounts> Accounts { get; set; }
+
+        public DbSet<ScoreProfile> ScoreProfile { get; set; }
     }
 }

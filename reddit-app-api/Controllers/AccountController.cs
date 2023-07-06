@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using NpgsqlTypes;
 using reddit_app_api.Data;
 using reddit_app_api.Models;
 using System.Diagnostics;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace reddit_app_api.Controllers
 {
@@ -41,6 +37,41 @@ namespace reddit_app_api.Controllers
             catch (Exception)
             {
                 return BadRequest();
+            }
+        }
+
+        [HttpPost("Register")]
+        public IActionResult Register([FromBody] RegistrationRequest request)
+        {
+            try
+            {
+                string username = request.username;
+                string email = request.email;
+                string password = request.password;
+
+                var result = _dbContext.Accounts.FromSqlRaw("SELECT * FROM register({0}, {1}, {2})", username, email, password).ToList();
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Username or Email already taken");
+            }
+        }
+
+        [HttpPost("RedditAccount")]
+        public IActionResult RedditAccountLogin([FromBody] RedditLoginRequest request)
+        {
+            try
+            {
+                Debug.WriteLine("id: " + request.id + " ; username: " + request.username);
+                var result = _dbContext.Accounts.FromSqlRaw("SELECT * FROM func_reddit_login({0}, {1})", request.id, request.username).ToList();
+
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Something went wrong with reddit login");
             }
         }
     }
